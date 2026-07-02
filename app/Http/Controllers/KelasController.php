@@ -7,6 +7,8 @@ use App\Models\TahunAjaran;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Models\Siswa;
+use App\Models\SiswaKelas;
 
 class KelasController extends Controller
 {
@@ -70,4 +72,54 @@ class KelasController extends Controller
 
         return back()->with('success', 'Kelas berhasil dihapus.');
     }
+
+    public function kelolaSiswa(Kelas $kelas)
+{
+    $kelas->load('tahunAjaran');
+
+    $siswaSudahMasuk = SiswaKelas::with('siswa')
+        ->where('kelas_id', $kelas->id)
+        ->get();
+
+    $siswaIdSudahDitempatkan = SiswaKelas::whereHas('kelas', function ($query) use ($kelas) {
+        $query->where('tahun_ajaran_id', $kelas->tahun_ajaran_id);
+    })->pluck('siswa_id');
+
+    $siswaBelumDitempatkan = Siswa::whereNotIn('id', $siswaIdSudahDitempatkan)
+        ->orderBy('nama')
+        ->get();
+
+    return view('master.kelas.siswa', compact('kelas', 'siswaSudahMasuk', 'siswaBelumDitempatkan'));
+}
+
+public function simpanSiswa(Request $request, Kelas $kelas)
+{
+    $validated = $request->validate([
+        'siswa_id' => 'required|array|min:1',
+        'siswa_id.*' => 'exists:siswa,id',
+    ]);
+
+    foreach ($validated['siswa_id'] as $siswaId) {
+        $sudahAda = SiswaKelas::whereHas('kelas', function ($query) use ($kelas) {
+            $query->where('tahun_ajaran_id', $kelas->tahun_ajaran_id);
+        })->where('siswa_id', $siswaId)->exists();
+
+        if (!$sudahAda) {
+            SiswaKelas::create([
+                'siswa_id' => $siswaId,
+                'kelas_id' => $kelas->id,
+            ]);
+        }
+    }
+
+    return back()->with('success', 'Siswa berhasil ditambahkan ke kelas.');
+}
+
+public function hapusSiswa(Kelas $kelas, SiswaKelas $siswaKelas)
+{
+    $siswaKelas->delete();
+
+    return back()->with('success', 'Siswa berhasil dikeluarkan dari kelas.');
+}
+
 }

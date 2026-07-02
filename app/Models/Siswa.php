@@ -26,4 +26,8 @@ class Siswa extends Model
     {
         return $this->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan';
     }
+    public function siswaKelas()
+{
+    return $this->hasMany(SiswaKelas::class);
+}
 }

@@ -37,7 +37,8 @@
 <a class="dropdown-item" href="{{ route('master.kelas.index') }}">Kelas</a>
 <a class="dropdown-item" href="{{ route('master.siswa.index') }}">Siswa</a>
 <a class="dropdown-item" href="{{ route('master.users.index') }}">Akun Guru</a>
-<a class="dropdown-item" href="{{ route('master.penugasan-guru.index') }}">Penugasan Guru</a>        </div>
+<a class="dropdown-item" href="{{ route('master.penugasan-guru.index') }}">Penugasan Guru</a>    
+<a class="dropdown-item" href="{{ route('master.pengaturan-sekolah.index') }}">Pengaturan Lokasi Sekolah</a>    </div>
     </li>
 @endif
 
@@ -75,6 +76,8 @@
 
         </div>
     </div>
+
+            @stack('scripts')
 
 </body>
 </html>

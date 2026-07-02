@@ -9,6 +9,9 @@ use App\Http\Controllers\KelasController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\PenugasanGuruController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PengaturanSekolahController;
+use App\Http\Controllers\QrPresensiController;
+use App\Http\Controllers\PresensiPublikController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -52,6 +55,11 @@ Route::middleware(['auth', 'role:guru_bk'])->prefix('guru-bk')->group(function (
     })->name('guru-bk.dashboard');
 });
 
+// Presensi - QR (bisa diakses admin & guru)
+Route::middleware(['auth', 'role:admin,guru'])->prefix('presensi')->group(function () {
+    Route::get('/qr/{kelas}', [QrPresensiController::class, 'tampilkan'])->name('presensi.qr.tampilkan');
+});
+
 Route::middleware(['auth', 'role:admin'])->prefix('master')->group(function () {
     Route::get('/tahun-ajaran-semester', [SemesterController::class, 'index'])->name('master.semester.index');
     Route::post('/tahun-ajaran', [SemesterController::class, 'storeTahunAjaran'])->name('master.tahun-ajaran.store');
@@ -81,4 +89,17 @@ Route::post('/users', [UserController::class, 'store'])->name('master.users.stor
 Route::patch('/users/{user}', [UserController::class, 'update'])->name('master.users.update');
 Route::patch('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('master.users.reset-password');
 Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('master.users.destroy');
+
+Route::get('/kelas/{kelas}/siswa', [KelasController::class, 'kelolaSiswa'])->name('master.kelas.kelola-siswa');
+Route::post('/kelas/{kelas}/siswa', [KelasController::class, 'simpanSiswa'])->name('master.kelas.simpan-siswa');
+Route::delete('/kelas/{kelas}/siswa/{siswaKelas}', [KelasController::class, 'hapusSiswa'])->name('master.kelas.hapus-siswa');
+
+Route::get('/pengaturan-sekolah', [PengaturanSekolahController::class, 'index'])->name('master.pengaturan-sekolah.index');
+Route::patch('/pengaturan-sekolah', [PengaturanSekolahController::class, 'update'])->name('master.pengaturan-sekolah.update');
+});
+
+// Presensi Publik (tanpa login - diakses siswa lewat scan QR)
+Route::prefix('presensi')->group(function () {
+    Route::get('/scan/{token}', [PresensiPublikController::class, 'tampilkan'])->name('presensi.scan.tampilkan');
+    Route::post('/scan/{token}', [PresensiPublikController::class, 'simpan'])->name('presensi.scan.simpan');
 });

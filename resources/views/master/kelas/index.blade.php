@@ -35,17 +35,23 @@
                             <td>{{ $k->nama_lengkap }}</td>
                             <td>{{ $k->waliKelas->name ?? '-' }}</td>
                             <td class="d-flex gap-1">
-                                <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modal-edit-{{ $k->id }}">
-                                    Edit Wali Kelas
-                                </button>
-                                <form action="{{ route('master.kelas.destroy', $k->id) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin hapus kelas {{ $k->nama_lengkap }}?')">
-                                        Hapus
-                                    </button>
-                                </form>
-                            </td>
+    <a href="{{ route('presensi.qr.tampilkan', $k->id) }}" class="btn btn-sm btn-outline-success" target="_blank">
+        Tampilkan QR
+    </a>
+    <a href="{{ route('master.kelas.kelola-siswa', $k->id) }}" class="btn btn-sm btn-outline-primary">
+        Kelola Siswa
+    </a>
+    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modal-edit-{{ $k->id }}">
+        Edit Wali Kelas
+    </button>
+    <form action="{{ route('master.kelas.destroy', $k->id) }}" method="POST">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin hapus kelas {{ $k->nama_lengkap }}?')">
+            Hapus
+        </button>
+    </form>
+</td>
                         </tr>
 
                         {{-- Modal Edit Wali Kelas --}}

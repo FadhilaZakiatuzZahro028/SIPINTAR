@@ -30,4 +30,9 @@ class Kelas extends Model
     {
         return "{$this->tingkat}-{$this->jurusan}-{$this->nomor}";
     }
+
+    public function siswaKelas()
+{
+    return $this->hasMany(SiswaKelas::class);
+}
 }
